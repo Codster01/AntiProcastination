@@ -2,9 +2,10 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const fs = require('fs');
 
 const app = express();
-app.use(cors())
+app.use(cors());
 const port = 3000; // You can change the port as needed
 
 // Connection URI and database configuration
@@ -21,14 +22,30 @@ const client = new MongoClient(uri, {
   }
 });
 
+// Load JEE.json data
+const jeeData = JSON.parse(fs.readFileSync('jee.json', 'utf8'));
+
 // Function to convert time string to total seconds
 function timeToSeconds(timeStr) {
   const [hours, minutes, seconds] = timeStr.split(' ').map(Number);
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-// Endpoint for fetching data
-app.get('/api/tasks', async (req, res) => {
+// Global variable to hold the latest data
+let latestData = {
+  totalDifferences: {
+    'No Detections': 0,
+    'Book': 0,
+    'Instagram': 0
+  },
+  recommendation: {
+    remainingStudyTime: 0,
+    remainingEntertainmentTime: 0
+  }
+};
+
+// Function to fetch data from MongoDB
+async function fetchData() {
   try {
     await client.connect();
 
@@ -54,13 +71,38 @@ app.get('/api/tasks', async (req, res) => {
       }
     }
 
-    res.send(totalDifferences);
+    // Calculate the time spent on study and entertainment
+    const studyTime = totalDifferences['Book'];
+    const entertainmentTime = totalDifferences['Instagram'];
+
+    // Calculate the remaining time based on jee.json targets
+    const remainingStudyTime = jeeData.study - studyTime;
+    const remainingEntertainmentTime = jeeData.entertainment - entertainmentTime;
+
+    const recommendation = {
+      remainingStudyTime: remainingStudyTime > 0 ? remainingStudyTime : 0,
+      remainingEntertainmentTime: remainingEntertainmentTime > 0 ? remainingEntertainmentTime : 0
+    };
+
+    // Update the global variable with the latest data
+    latestData = {
+      totalDifferences,
+      recommendation
+    };
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     await client.close();
   }
+}
+
+// Initial fetch and setup interval to fetch data every 5 seconds
+fetchData();
+setInterval(fetchData, 5000);
+
+// Endpoint for fetching data and providing recommendations
+app.get('/api/tasks', (req, res) => {
+  res.send(latestData);
 });
 
 app.listen(port, () => {
