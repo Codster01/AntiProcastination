@@ -4,7 +4,7 @@ import 'chart.js/auto';
 import axios from 'axios';
 
 export default function ChartCompt() {
-  const fixUrl = "http://192.168.53.180";
+  const fixUrl = "http://192.168.53.213";
   const getUrl = `${fixUrl}:3000/api/tasks`;
 
   const [instadata, setInstaData] = useState([]);
@@ -41,11 +41,11 @@ export default function ChartCompt() {
       <div>
         <Bar
           data={{
-            labels: ['Mon', 'Tues', 'Wed'],
+            labels: ['Mon', 'Tues', 'Wed', 'Thur' ,'Fri' ,'Sat' , 'Sun'],
             datasets: [
               {
                 label: "Time spent on Mobile (hrs)",
-                data: [150, 500, instadata]
+                data: [150, 500, 455,instadata,300,233,560]
               }
             ]
           }}
