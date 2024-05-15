@@ -45,60 +45,6 @@ let latestData = {
 };
 
 // // Function to fetch data from MongoDB
-// async function fetchData() {
-//   try {
-//     await client.connect();
-
-//     const db = client.db(dbName);
-//     const collection = db.collection(collectionName);
-
-//     // Perform a find operation on the collection
-//     const tasks = await collection.find({}).toArray();
-
-//     let totalDifferences = {
-//       'No Detections': 0,
-//       'Book': 0,
-//       'Instagram': 0
-//     };
-
-//     for (let i = 0; i < tasks.length - 1; i++) {
-//       const timeDiff = Math.abs(timeToSeconds(tasks[i].Time) - timeToSeconds(tasks[i + 1].Time));
-
-//       // Add the time difference to the current (previous) task
-//       if (tasks[i].Date === tasks[i + 1].Date) {
-//         const taskType = tasks[i].Task;
-//         totalDifferences[taskType] += timeDiff;
-//       }
-//     }
-
-//     // Calculate the time spent on study and entertainment
-//     const studyTime = totalDifferences['Book'];
-//     const entertainmentTime = totalDifferences['Instagram'];
-//     console.log(entertainmentTime)
-//     console.log("hello")
-//     // Calculate the remaining time based on jee.json targets
-//     const remainingStudyTime = jeeData.study - studyTime;
-//     const remainingEntertainmentTime = jeeData.entertainment - entertainmentTime;
-//     console.log(remainingEntertainmentTime)
-//     const recommendation = {
-//       remainingStudyTime: remainingStudyTime > 0 ? remainingStudyTime : 0,
-//       remainingEntertainmentTime: remainingEntertainmentTime > 0 ? remainingEntertainmentTime : 0
-//     };
-
-//     // Update the global variable with the latest data
-//     latestData = {
-//       totalDifferences,
-//       recommendation
-//     };
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     await client.close();
-//   }
-// }
-//////////////////////////////////////////
-
-
 async function fetchData() {
   try {
     await client.connect();
@@ -106,19 +52,8 @@ async function fetchData() {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // Get the current date
-    const currentDate = new Date();
-    const currentDateString = currentDate.toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    });
-
-    // Construct a query to find documents with the Date field matching the current date
-    const query = { Date: currentDateString };
-
-    // Find documents matching the query
-    const tasks = await collection.find(query).toArray();
+    // Perform a find operation on the collection
+    const tasks = await collection.find({}).toArray();
 
     let totalDifferences = {
       'No Detections': 0,
@@ -139,14 +74,15 @@ async function fetchData() {
     // Calculate the time spent on study and entertainment
     const studyTime = totalDifferences['Book'];
     const entertainmentTime = totalDifferences['Instagram'];
-
+    console.log(entertainmentTime)
+    console.log("hello")
     // Calculate the remaining time based on jee.json targets
     const remainingStudyTime = jeeData.study - studyTime;
     const remainingEntertainmentTime = jeeData.entertainment - entertainmentTime;
-
+    console.log(remainingEntertainmentTime)
     const recommendation = {
-      remainingStudyTime: Math.max(remainingStudyTime, 0),
-      remainingEntertainmentTime: Math.max(remainingEntertainmentTime, 0)
+      remainingStudyTime: remainingStudyTime > 0 ? remainingStudyTime : 0,
+      remainingEntertainmentTime: remainingEntertainmentTime > 0 ? remainingEntertainmentTime : 0
     };
 
     // Update the global variable with the latest data
@@ -160,7 +96,95 @@ async function fetchData() {
     await client.close();
   }
 }
+//////////////////////////////////////////
 
+
+// async function fetchData() {
+//   try {
+//     await client.connect();
+
+//     const db = client.db(dbName);
+//     const collection = db.collection(collectionName);
+
+//     // Get the current date
+//     const currentDate = new Date();
+//     const currentDateString = currentDate.toLocaleDateString('en-US', {
+//       day: '2-digit',
+//       month: '2-digit',
+//       year: '2-digit'
+//     });
+
+//     // Construct a query to find documents with the Date field matching the current date
+//     const query = { Date: currentDateString };
+
+//     // Find documents matching the query
+//     const tasks = await collection.find(query).toArray();
+
+//     let totalDifferences = {
+//       'No Detections': 0,
+//       'Book': 0,
+//       'Instagram': 0
+//     };
+
+//     for (let i = 0; i < tasks.length - 1; i++) {
+//       const timeDiff = Math.abs(timeToSeconds(tasks[i].Time) - timeToSeconds(tasks[i + 1].Time));
+
+//       // Add the time difference to the current (previous) task
+//       if (tasks[i].Date === tasks[i + 1].Date) {
+//         const taskType = tasks[i].Task;
+//         totalDifferences[taskType] += timeDiff;
+//       }
+//     }
+
+//     // Calculate the time spent on study and entertainment
+//     const studyTime = totalDifferences['Book'];
+//     const entertainmentTime = totalDifferences['Instagram'];
+
+//     // Calculate the remaining time based on jee.json targets
+//     const remainingStudyTime = jeeData.study - studyTime;
+//     const remainingEntertainmentTime = jeeData.entertainment - entertainmentTime;
+
+//     const recommendation = {
+//       remainingStudyTime: Math.max(remainingStudyTime, 0),
+//       remainingEntertainmentTime: Math.max(remainingEntertainmentTime, 0)
+//     };
+
+//     // Update the global variable with the latest data
+//     latestData = {
+//       totalDifferences,
+//       recommendation
+//     };
+//   } catch (error) {
+//     console.error(error);
+//   } finally {
+//     await client.close();
+//   }
+// }
+
+
+app.get('/api/tasks/instadata', async (req, res) => {
+  try {
+    await client.connect();
+
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    // Fetch Instagram data
+    const instaData = await collection.find({ Task: 'Instagram' }).toArray();
+
+    // Fetch Book data
+    const bookData = await collection.find({ Task: 'Book' }).toArray();
+
+    // Close the MongoDB connection
+    await client.close();
+
+    // Send both instaData and bookData in the response
+    res.send({ instaData, bookData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 
