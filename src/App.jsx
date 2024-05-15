@@ -7,7 +7,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-const [isAuth,setIsAuth] = useState(false)
+const [isAuth,setIsAuth] = useState(true)
 const handleLogin = (status) =>{
   setIsAuth(status)
 }
