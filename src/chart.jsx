@@ -57,8 +57,8 @@ export default function ChartCompt() {
 
 
 
-  let dailyAvg = (instadata + bookdata) / 60;
-  let weeklyTotal = dailyAvg * 7;
+  let dailyAvg = (bookdata) / 6000;
+  let weeklyTotal = dailyAvg * 7.1;
   const instaTimeSpentOnDays  = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
   if (Array.isArray(newInstaData)) {
     // Initialize an array to hold the time spent on each day
@@ -139,31 +139,12 @@ export default function ChartCompt() {
           className='line-container'
         />
       </div>
-      {/* <div>
-        <Bar
-          data={{
-            labels: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'],
-            datasets: [
-              {
-                label: 'Remaining Study Time (hrs)',
-                data: [remainingStudyTime , remainingStudyTime , remainingStudyTime , remainingStudyTime , remainingStudyTime , remainingStudyTime , remainingStudyTime ]
-              },
-              {
-                label: 'Remaining Entertainment Time (hrs)',
-                data: [remainingEntertainmentTime , remainingEntertainmentTime , remainingEntertainmentTime , remainingEntertainmentTime , remainingEntertainmentTime , remainingEntertainmentTime , remainingEntertainmentTime ]
-              }
-            ]
-          }}
-          height={400}
-          width={600}
-          className='chart-container'
-        />
-      </div> */}
+  
 
       <div className='stats'>
         <div>
           <p>Daily Avg</p>
-          <h4>{dailyAvg.toFixed(2)}<sub>m</sub></h4>
+          <h4>{dailyAvg.toFixed(2)}<sub>H</sub></h4>
         </div>
         <div>
           <p>Weekly Total</p>

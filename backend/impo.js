@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(cors());
@@ -21,6 +22,32 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'collegemail1006@gmail.com', // Your Gmail username
+    pass: 'cghhakoathbvlhwf' // Your Gmail password
+  }
+});
+let emailSent = false; 
+
+async function sendEmail(emailContent) {
+  try {
+    // Send mail with defined transport object
+    await transporter.sendMail({
+      from: 'yourgmail@gmail.com', // Your Gmail username
+      to: 'dhruvgangar1234@gmail.com', // Recipient's email address
+      subject: 'Instagram Usage Threshold Exceeded',
+      text: emailContent
+    });
+
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+}
+
 
 // Load JEE.json data
 const jeeData = JSON.parse(fs.readFileSync('jee.json', 'utf8'));
@@ -84,7 +111,15 @@ async function fetchData() {
       remainingStudyTime: remainingStudyTime > 0 ? remainingStudyTime : 0,
       remainingEntertainmentTime: remainingEntertainmentTime > 0 ? remainingEntertainmentTime : 0
     };
-
+    const instagramThreshold = 30
+    if (!emailSent && entertainmentTime > instagramThreshold) {
+      // Send email only if not already sent and threshold is exceeded
+      await sendEmail('Instagram Usage Alert', `You have used Instagram for ${entertainmentTime} seconds today.`);
+      emailSent = true;
+    } else if (emailSent) {
+      console.log("Email already sent today");
+    }
+  
     // Update the global variable with the latest data
     latestData = {
       totalDifferences,
@@ -192,7 +227,7 @@ app.get('/api/tasks/instadata', async (req, res) => {
 
 // Initial fetch and setup interval to fetch data every 5 seconds
 fetchData();
-setInterval(fetchData, 5000);
+setInterval(fetchData, 10000);
 
 // Endpoint for fetching data and providing recommendations
 app.get('/api/tasks', (req, res) => {
