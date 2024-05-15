@@ -23,7 +23,7 @@ setPassText("")
 
 const handleLogin =() =>{
   console.log("clicked!")
-   if(usertext==="ipd" && passtext==="dhruv"){
+   if(usertext==="ipd" && passtext==="ipd"){
     console.log(usertext)
     onLogin(true)
   }

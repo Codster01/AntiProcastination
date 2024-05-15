@@ -60,6 +60,8 @@ export default function ChartCompt() {
   let dailyAvg = (bookdata) / 6000;
   let weeklyTotal = dailyAvg * 7.1;
   const instaTimeSpentOnDays  = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
+  const goalData = 200
+  let thursday = 0 
   if (Array.isArray(newInstaData)) {
     // Initialize an array to hold the time spent on each day
    
@@ -75,11 +77,12 @@ export default function ChartCompt() {
 
         // Get the day of the week (0 for Sunday, 1 for Monday, etc.)
         const dayOfWeek = date.getDay();
-
         // Aggregate the time spent on this day
         instaTimeSpentOnDays [dayOfWeek] += parseInt(item.Time);
-    })}
-
+      })}
+      thursday = instaTimeSpentOnDays[3]
+      console.log(thursday)
+      
     const bookTimeSpentOnDays = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
 
     // Aggregate the time spent on each day for bookData
@@ -98,6 +101,9 @@ export default function ChartCompt() {
     
             // Aggregate the time spent on this day
             bookTimeSpentOnDays[dayOfWeek] += parseInt(item.Time);
+           for(let i = 0 ; i<7;i++ ){
+            dailyAvg += bookTimeSpentOnDays[i] 
+           }
         });
     }  
 
@@ -144,11 +150,12 @@ export default function ChartCompt() {
       <div className='stats'>
         <div>
           <p>Daily Avg</p>
-          <h4>{dailyAvg.toFixed(2)}<sub>H</sub></h4>
+          
+          <h4>{dailyAvg.toFixed(2)}<sub>m</sub></h4>
         </div>
         <div>
           <p>Weekly Total</p>
-          <h4>{Math.floor(weeklyTotal)}<sub>H</sub> {Math.floor((weeklyTotal % 1) * 60)}<sub>m</sub></h4>
+          <h4>{Math.floor((dailyAvg*7)/60)}<sub>H</sub> {Math.floor((dailyAvg % 1) * 60)}<sub>m</sub></h4>
         </div>
         <div>
           <p>The Shortest</p>
@@ -158,6 +165,15 @@ export default function ChartCompt() {
           <p>The Longest</p>
           <h4>40<sub>H</sub> 39<sub>m</sub></h4>
         </div>
+      </div>
+      <br />
+      <br />
+
+      <div className='stats2'>
+       
+          <h4>Time remaining to reach your Today's Goal</h4>
+          <h4>{goalData-thursday}<sub>m</sub></h4>
+        
       </div>
     </>
   );

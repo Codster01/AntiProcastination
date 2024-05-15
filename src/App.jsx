@@ -18,7 +18,7 @@ const handleLogin = (status) =>{
 
         <div className="main-container">
         <div className="header">
-          <h5>Ikhsha</h5>
+        <h5 onClick={() => window.location.reload()}>Ikhsha</h5>
         </div>
         <div className="dashboard-container">
           <div className="dashboard"><h4>Dashboard</h4></div>

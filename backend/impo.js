@@ -37,7 +37,7 @@ async function sendEmail(emailContent) {
     // Send mail with defined transport object
     await transporter.sendMail({
       from: 'yourgmail@gmail.com', // Your Gmail username
-      to: 'dhruvgangar1234@gmail.com', // Recipient's email address
+      to: ['dhruvgangar1234@gmail.com'], // Recipient's email address
       subject: 'Instagram Usage Threshold Exceeded',
       text: emailContent
     });
@@ -114,7 +114,11 @@ async function fetchData() {
     const instagramThreshold = 30
     if (!emailSent && entertainmentTime > instagramThreshold) {
       // Send email only if not already sent and threshold is exceeded
-      await sendEmail('Instagram Usage Alert', `You have used Instagram for ${entertainmentTime} seconds today.`);
+      await sendEmail(
+      `
+      Instagram Usage Alert: Time to Focus!
+      You've exceeded your Instagram usage limit for today. 
+      It's time to switch gears and focus on your goals!`);
       emailSent = true;
     } else if (emailSent) {
       console.log("Email already sent today");
@@ -227,7 +231,7 @@ app.get('/api/tasks/instadata', async (req, res) => {
 
 // Initial fetch and setup interval to fetch data every 5 seconds
 fetchData();
-setInterval(fetchData, 10000);
+setInterval(fetchData, 1000000);
 
 // Endpoint for fetching data and providing recommendations
 app.get('/api/tasks', (req, res) => {
